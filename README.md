@@ -1,7 +1,8 @@
-# flask-project
+# Fruit Vegetable Quality Predictor Backend using Flask Restful
 
 ## Deployment
 This project was deployed to Heroku. You can click this [link] to see it.
+Click [here] to see the frontend web.
 
 
 ## How to run the program?
@@ -36,5 +37,5 @@ Open test.ipynb using VS Code and run all the cells inside the notebook
 
 
 [link]: <https://fruits-vegetables-backend.herokuapp.com/>
-
+[here]: <https://fadlil10-ml2p2-frontend.herokuapp.com/>
 
