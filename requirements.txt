@@ -5,3 +5,4 @@ numpy==1.23.3
 pybase64==1.2.3
 opencv-python-headless
 Pillow
+flask-restful

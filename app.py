@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, request
 import numpy as np
 import base64
 import json
@@ -7,8 +7,11 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 import os
 import cv2
+from flask_restful import Resource, Api
 
 app = Flask(__name__)
+
+api = Api(app)
 
 dict_class = {0: 'Fresh Apple',
  1: 'Fresh Banana',
@@ -30,24 +33,32 @@ def json2im(jstr):
     im = pickle.loads(imdata)
     return im
 
-@app.route('/')
-def home():
-    return "Helloworld"
+class Home(Resource):
 
-@app.route('/fruit', methods=['GET', 'POST'])
-def fruit():
-    if request.method=="POST":
-        data = request.json
-        json_to_img = json2im(data)
-        res = np.array([json_to_img[:,:,2].T, json_to_img[:,:,1].T, json_to_img[:,:,0].T]).T
-        path = ''
-        cv2.imwrite(os.path.join(path , 'inf_image.jpg'), np.array(res))
-        img = image.load_img('inf_image.jpg', target_size=(128,128))
-        x = image.img_to_array(img)
-        model = load_model("fruit_veg_model.h5")
-        classes = np.argmax(model.predict(np.array([x])/255))
-        response = {'code':200, 'status':'OK', 
-                    'result':dict_class[int(classes)]}
-        return jsonify(response)
-    return "Gunakan method post"
+    def get(self):
+        return "Helloworld"
 
+class Fruit(Resource):
+
+    def get(self):
+        return {'message':'please use post method'}
+
+    def post(self):
+        data = request.get_json(force=True)
+        try:
+            json_to_img = json2im(data)
+            res = np.array([json_to_img[:,:,2].T, json_to_img[:,:,1].T, json_to_img[:,:,0].T]).T
+            path = ''
+            cv2.imwrite(os.path.join(path , 'inf_image.jpg'), np.array(res))
+            img = image.load_img('inf_image.jpg', target_size=(128,128))
+            x = image.img_to_array(img)
+            model = load_model("fruit_veg_model.h5")
+            classes = np.argmax(model.predict(np.array([x])/255))
+            response = {'code':200, 'status':'OK', 
+                        'result':dict_class[int(classes)]}
+            return response, 200
+        except:
+            return {'status':'error'}, 400
+
+api.add_resource(Home, '/')
+api.add_resource(Fruit, '/fruit')
